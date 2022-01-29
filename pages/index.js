@@ -27,7 +27,7 @@ export default function PaginaInicial() {
     function avatar() {
 
         if (!username) {
-            return 'https://cdn-icons.flaticon.com/png/512/3339/premium/3339155.png?token=exp=1643222839~hmac=b7adeb39269f6c4ee04c2c9feb6e25ad'
+            return 'https://github.com/github.png';
         }
 
         return `https://github.com/${username}.png`

@@ -1,22 +1,43 @@
 import { Box, Text, TextField, Image, Button, Icon } from '@skynexui/components';
+import { createClient } from '@supabase/supabase-js';
 import React from 'react';
 import appConfig from '../config.json';
+
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzQ5NDMwOSwiZXhwIjoxOTU5MDcwMzA5fQ.wTA_tg5Hq8PVoxAtWvKuhGTDDOApWo7BAxuFTots268';
+const SUPABASE_URL = 'https://acvwjzfafosyuhjpsbxn.supabase.co';
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default function ChatPage() {
     const [mensagem, setMensagem] = React.useState('');
     const [listaMensagem, setListaMensagem] = React.useState([]);
 
+    React.useEffect(() => {
+        supabaseClient
+            .from('mensagens')
+            .select('*')
+            .order('id', { ascending: false })
+            .then(({ data }) => {
+                setListaMensagem(data)
+            });
+
+    }, [listaMensagem]);
+
     function handleNovaMensagem(novaMensagem) {
         const message = {
-            id: listaMensagem.length + 1,
-            userPhoto: 'https://github.com/GeyzonErik.png',
             from: 'GeyzonErik',
             text: novaMensagem,
-        }
-        setListaMensagem([
-            message,
-            ...listaMensagem
-        ])
+        };
+
+        supabaseClient
+            .from('mensagens')
+            .insert([message])
+            .then(({ data }) => {
+                setListaMensagem([
+                    data[0],
+                    ...listaMensagem
+                ]);
+            });
+
         setMensagem('');
     }
 
@@ -178,15 +199,25 @@ function MessageList(props) {
                                 alignItems: 'center'
                             }}
                         >
-                            <Image
-                                styleSheet={{
-                                    width: '46px',
-                                    borderRadius: '50%',
-                                    display: 'inline-block',
-                                    marginRight: '8px',
-                                }}
-                                src={mensagem.userPhoto}
-                            />
+                            <a
+                                href={`https://github.com/${mensagem.from}`}
+                                target='_blank'
+                            >
+                                <Image
+                                    styleSheet={{
+                                        width: '46px',
+                                        borderRadius: '50%',
+                                        display: 'inline-block',
+                                        marginRight: '8px',
+                                        hover: {
+                                            transform: 'rotate(45deg)',
+                                            transition: 'linear 0.32s',
+                                        },
+                                        transition: 'linear 0.32s',
+                                    }}
+                                    src={`https://github.com/${mensagem.from}.png`}
+                                />
+                            </a>
                             <Text
                                 tag="strong"
                                 styleSheet={{
